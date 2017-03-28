@@ -1,0 +1,12 @@
+<html>
+<head>
+
+{{template "base-main"}}
+
+{{buildLinkToJSFiles `
+, ../tpl/views/*.js
+`}}
+
+</head>
+<body>
+</body>
