@@ -10,6 +10,7 @@ import (
 	"github.com/tdewolff/minify/js"
 )
 
+// Example is the example.
 func Example() {
 	min := minify.New()
 	min.AddFunc(helpers.JSMimeType, js.Minify)

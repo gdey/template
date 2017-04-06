@@ -87,6 +87,7 @@ type Template struct {
 
 type anOption func(t *Template) error
 
+// BConfig is the main object that holds the config for BaseConfig.
 type BConfig []anOption
 
 // BaseConfig creates a base config that can be used to create other templates from it without have to respecify the

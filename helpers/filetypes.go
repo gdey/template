@@ -9,7 +9,7 @@ const (
 	CSSMimeType = "text/css"
 	// TXTMimeType is the mime type for Text files
 	TXTMimeType = "text/plain"
-	// JSOMMimeType is the mime type for JSon files.
+	// JSONMimeType is the mime type for JSon files.
 	JSONMimeType = "text/json"
 )
 

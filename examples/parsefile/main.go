@@ -6,6 +6,7 @@ import (
 	"github.com/gdey/template"
 )
 
+// Example is the example.
 func Example() {
 	tpl := template.Must(
 		template.Must(template.New("main.template",
