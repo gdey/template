@@ -203,9 +203,4 @@ DONE_PREFIX:
 	return fname, nil
 }
 
-func init() {
-	mime.AddExtensionType(".js", "text/javascript")
-	mime.AddExtensionType(".css", "text/css")
-	mime.AddExtensionType(".txt", "text/plain")
-	mime.AddExtensionType(".json", "text/json")
-}
+

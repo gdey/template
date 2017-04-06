@@ -2,12 +2,15 @@ package template
 
 import (
 	"bufio"
+	"fmt"
 	"html/template"
 	"log"
 	"os"
 	"path/filepath"
 	"strings"
 	"sync"
+
+	"github.com/gdey/template/helpers"
 )
 
 // The Source of the parsefile
@@ -58,6 +61,7 @@ type Template struct {
 	// The base url
 	root string
 
+	// helpers are the Helpers that the user is adding
 	helpers template.FuncMap
 
 	// Lock for parseFileSouces and parseFiles
@@ -72,6 +76,9 @@ type Template struct {
 	// Build File cache; this holds a key and the old filename for the buildfile. This way,
 	// Only the first called for a set of files generates the build file in a template.
 	buildFileOldFilenameCaché map[string]string
+
+	// minifiers are the list of minifiers that can be used to minify files; indexed by mimetype.
+	minifiers map[string]helpers.Minifier
 }
 
 type anOption func(t *Template) error
@@ -131,6 +138,17 @@ func ResourceRoot(base string) anOption {
 func URLBase(root string) anOption {
 	return func(t *Template) error {
 		t.root = root
+		return nil
+	}
+}
+
+// Minifier to use for the given mimetype. Only one minifier is allowed per mimetype.
+func Minifier(mimetype string, minifier helpers.Minifier) anOption {
+	return func(t *Template) error {
+		if _, ok := t.minifiers[mimetype]; ok {
+			return fmt.Errorf("Minifier for “%v” already provided.", mimetype)
+		}
+		t.minifiers[mimetype] = minifier
 		return nil
 	}
 }
@@ -266,10 +284,11 @@ func ParseGlob(globs ...string) anOption {
 // Name of the template and a set of options
 func New(name string, options ...anOption) (*Template, error) {
 	t := Template{
-		name:     name,
-		Template: template.New(name),
+		name:                      name,
+		Template:                  template.New(name),
+		minifiers:                 make(map[string]helpers.Minifier),
+		buildFileOldFilenameCaché: make(map[string]string),
 	}
-	t.buildFileOldFilenameCaché = make(map[string]string)
 
 	// New we need to install all our Helpers. We first install our Helpers, then
 	// We install the users handlers, this does mean that the user can overwrite our
