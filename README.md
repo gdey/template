@@ -24,7 +24,7 @@ default to the system:
  
  ---------------------------------
 
- Look at `examples/parsefile` for an example of how to use the package.
+ Look at `examples/parsefilemin` for an example of how to use the package.
  
  ```go
 package main
@@ -32,15 +32,23 @@ package main
 import (
 	"os"
 
-	"github.com/cereshq/lis/util/template"
+	"github.com/gdey/template"
+	"github.com/tdewolff/minify"
+	"github.com/tdewolff/minify/css"
+	"github.com/tdewolff/minify/js"
 )
 
 func main() {
+    min := minify.New()
+    min.AddFunc(helpers.JSMimeType, js.Minify)
+    min.AddFunc(helpers.CSSMimeType, css.Minify)
 	tpl := template.Must(
 		template.Must(template.New("main.template",
 			template.ParseFileList("tpl/parsefile.txt"),
 			template.URLBase("static"),
 			template.DistRoot("examples/tmp"),
+			template.Minifier(helpers.JSMimeType, min),
+            template.Minifier(helpers.CSSMimeType, min),
 		)).ParseFiles())
 	if err := tpl.Execute(os.Stdout, "No Data"); err != nil {
 		panic(err)

@@ -43,6 +43,7 @@ func filepatternToFilenames(base string, patterns []string) (filenames []string,
 }
 
 func (t *Template) BuildJSFile(patterns ...string) (filename string, err error) {
+
 	filenames, err := filepatternToFilenames(t.base, patterns)
 	if err != nil {
 		return "", err
@@ -53,7 +54,7 @@ func (t *Template) BuildJSFile(patterns ...string) (filename string, err error) 
 	dest := t.dist
 	t.buildLock.Unlock()
 
-	if filename, err = helpers.BuildJSFile(dest, oldFilename, filenames...); err != nil {
+	if filename, err = helpers.BuildFile(dest, t.minifiers[helpers.JSMimeType], helpers.JSMimeType, oldFilename, filenames...); err != nil {
 		return filename, err
 	}
 	if oldFilename != filename {
@@ -96,7 +97,7 @@ func (t *Template) BuildCSSFile(patterns ...string) (filename string, err error)
 	dest := t.dist
 	t.buildLock.Unlock()
 
-	if filename, err = helpers.BuildCSSFile(dest, oldFilename, filenames...); err != nil {
+	if filename, err = helpers.BuildFile(dest, t.minifiers[helpers.CSSMimeType], helpers.CSSMimeType, oldFilename, filenames...); err != nil {
 		return filename, err
 	}
 	if oldFilename != filename {
