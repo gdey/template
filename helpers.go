@@ -42,10 +42,18 @@ func filepatternToFilenames(base string, patterns []string) (filenames []string,
 	return filenames, nil
 }
 
-// BuildJSFile is a helper function that takes a set of filename and generated a combined (minimizied if a minimizer is provided)
-// Javascript file.
-func (t *Template) BuildJSFile(patterns ...string) (filename string, err error) {
+// BuildMimeTypeFile is a helper function that takes a MimeType and a set of filenames and generated a combined (minimizied if a minimizer is provided)
+// file.
+func (t *Template) BuildMimeTypeFile(mimetype string, fnames string) (filename string, err error) {
 
+	var patterns []string
+	for _, fname := range strings.Split(fnames, ",") {
+		fn := strings.TrimSpace(fname)
+		if fn == "" {
+			continue
+		}
+		patterns = append(patterns, fn)
+	}
 	filenames, err := filepatternToFilenames(t.base, patterns)
 	if err != nil {
 		return "", err
@@ -56,7 +64,7 @@ func (t *Template) BuildJSFile(patterns ...string) (filename string, err error) 
 	dest := t.dist
 	t.buildLock.Unlock()
 
-	if filename, err = helpers.BuildFile(dest, t.minifiers[helpers.JSMimeType], helpers.JSMimeType, oldFilename, filenames...); err != nil {
+	if filename, err = helpers.BuildFile(dest, t.minifiers[mimetype], mimetype, oldFilename, filenames...); err != nil {
 		return filename, err
 	}
 	if oldFilename != filename {
@@ -67,17 +75,15 @@ func (t *Template) BuildJSFile(patterns ...string) (filename string, err error) 
 	return filename, err
 }
 
+// BuildJSFile is a helper function that takes a set of filename and generated a combined (minimizied if a minimizer is provided)
+// Javascript file.
+func (t *Template) BuildJSFile(fnames string) (filename string, err error) {
+	return t.BuildMimeTypeFile(helpers.JSMimeType, fnames)
+}
+
 // LinkToAndBuildJSFile is the same as the buildJSFiles but will return a script tag contain the appropriate URL.
 func (t *Template) LinkToAndBuildJSFile(fnames string) (template.HTML, error) {
-	var filenames []string
-	for _, fname := range strings.Split(fnames, ",") {
-		fn := strings.TrimSpace(fname)
-		if fn == "" {
-			continue
-		}
-		filenames = append(filenames, fn)
-	}
-	filename, err := t.BuildJSFile(filenames...)
+	filename, err := t.BuildJSFile(fnames)
 	if err != nil {
 		return "", err
 	}
@@ -90,40 +96,13 @@ func (t *Template) LinkToAndBuildJSFile(fnames string) (template.HTML, error) {
 
 // BuildCSSFile is a helper function that takes a set of filename and generated a combined (minimizied if a minimizer is provided)
 // Javascript file.
-func (t *Template) BuildCSSFile(patterns ...string) (filename string, err error) {
-
-	filenames, err := filepatternToFilenames(t.base, patterns)
-	if err != nil {
-		return "", err
-	}
-	key := makeKey(filenames)
-	t.buildLock.Lock()
-	oldFilename := t.buildFileOldFilenameCaché[key]
-	dest := t.dist
-	t.buildLock.Unlock()
-
-	if filename, err = helpers.BuildFile(dest, t.minifiers[helpers.CSSMimeType], helpers.CSSMimeType, oldFilename, filenames...); err != nil {
-		return filename, err
-	}
-	if oldFilename != filename {
-		t.buildLock.Lock()
-		t.buildFileOldFilenameCaché[key] = filename
-		t.buildLock.Unlock()
-	}
-	return filename, err
+func (t *Template) BuildCSSFile(fnames string) (filename string, err error) {
+	return t.BuildMimeTypeFile(helpers.CSSMimeType, fnames)
 }
 
 // LinkToAndBuildCSSFile is the same as the buildCSSFiles but will return a link tag contain the appropriate URL.
 func (t *Template) LinkToAndBuildCSSFile(fnames string) (template.HTML, error) {
-	var filenames []string
-	for _, fname := range strings.Split(fnames, ",") {
-		fn := strings.TrimSpace(fname)
-		if fn == "" {
-			continue
-		}
-		filenames = append(filenames, fn)
-	}
-	filename, err := t.BuildCSSFile(filenames...)
+	filename, err := t.BuildCSSFile(fnames)
 	if err != nil {
 		return "", err
 	}
