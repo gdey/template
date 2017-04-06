@@ -304,6 +304,7 @@ func New(name string, options ...anOption) (*Template, error) {
 	// We install the users handlers, this does mean that the user can overwrite our
 	// Helpers
 	t.helpers = template.FuncMap{
+		"buildMimeTypeFiles":  t.BuildMimeTypeFile,
 		"buildJSFiles":        t.BuildJSFile,
 		"buildLinkToJSFiles":  t.LinkToAndBuildJSFile,
 		"buildCSSFiles":       t.BuildCSSFile,
