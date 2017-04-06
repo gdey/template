@@ -17,8 +17,11 @@ import (
 type sourceType uint
 
 const (
+	// SrcFileList is a file that contains a list of ParseFiles.
 	SrcFileList = sourceType(iota)
+	// SrcParseFile is just a ParseFile
 	SrcParseFile
+	// SrcGlobFile is a glob that may or may not result in ParseFiles.
 	SrcGlobFile
 )
 
@@ -48,6 +51,7 @@ func init() {
 
 }
 
+// Template is the main template object.
 type Template struct {
 	*template.Template
 
@@ -85,10 +89,13 @@ type anOption func(t *Template) error
 
 type BConfig []anOption
 
+// BaseConfig creates a base config that can be used to create other templates from it without have to respecify the
+// options.
 func BaseConfig(options ...anOption) BConfig {
 	return BConfig(options)
 }
 
+// NewTemplate returns a template object based on the options set in the base config.
 func (bc BConfig) NewTemplate(name string, options ...anOption) (*Template, error) {
 	var opts []anOption
 	opts = append(opts, bc...)
@@ -246,6 +253,7 @@ func ParseFileList(ffile string, files ...string) anOption {
 	}
 }
 
+// ParseFile will add the file provided to the set of files to parse for the template.
 func ParseFile(files ...string) anOption {
 	return func(t *Template) error {
 		for _, file := range files {
@@ -269,6 +277,7 @@ func parseGlob(t *Template, glob string) error {
 	return nil
 }
 
+// ParseGlob will add files it finds from the provided globs to the list of files to parse for the template.
 func ParseGlob(globs ...string) anOption {
 	return func(t *Template) error {
 		for _, glob := range globs {
@@ -281,7 +290,7 @@ func ParseGlob(globs ...string) anOption {
 	}
 }
 
-// Name of the template and a set of options
+// New creates a new template. Name of the template and a set of options
 func New(name string, options ...anOption) (*Template, error) {
 	t := Template{
 		name:                      name,
@@ -309,6 +318,7 @@ func New(name string, options ...anOption) (*Template, error) {
 	return &t, nil
 }
 
+// Must will panic if there is an error other returns the template.
 func Must(t *Template, err error) *Template {
 	if err != nil {
 		panic(err)

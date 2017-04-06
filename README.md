@@ -1,3 +1,6 @@
+[![Go Report Card](https://goreportcard.com/badge/github.com/gdey/template)](https://goreportcard.com/report/github.com/gdey/template)
+[![Build Status](https://travis-ci.org/gdey/template.svg?branch=master)](https://travis-ci.org/gdey/template)
+
 # Template
 
 This is a simple wrapper around [html/template](http://godoc.org/html/template). The main
