@@ -3,10 +3,10 @@ package main
 import (
 	"os"
 
-	"github.com/cereshq/lis/util/template"
+	"github.com/gdey/template"
 )
 
-func main() {
+func Example() {
 	tpl := template.Must(
 		template.Must(template.New("main.template",
 			template.ParseFileList("tpl/parsefile.txt"),
@@ -16,22 +16,21 @@ func main() {
 	if err := tpl.Execute(os.Stdout, "No Data"); err != nil {
 		panic(err)
 	}
+
+	// Output:
+	// <html>
+	// <head>
+	//
+	//
+	//	<meta charset="utf-8">
+	//	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	//
+	//
+	// <script type="text/javascript" src="static/jsbuild-0b96c8ce82fd02cfea234be7618cd86358b7119e.js"></script>
+	//
+	// </head>
+	// <body>
+	// </body>
 }
 
-/*
-output:
-<html>
-<head>
-
-
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-
-<script type="text/javascript" src="static/jsbuild-0b96c8ce82fd02cfea234be7618cd86358b7119e.js"></script>
-
-</head>
-<body>
-</body>
-
-*/
+func main() { Example() }

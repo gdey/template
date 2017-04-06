@@ -84,6 +84,46 @@ func (omap OrderedMapType) Set(key, value string) OrderedMapType {
 	return omap
 }
 
+// copyFileContents copies the contents of the file named src to the file named
+// by dst. The file will be created if it does not already exist. If the
+// destination file exists, all it's contents will be replaced by the contents
+// of the source file.
+// Gotten from: http://stackoverflow.com/questions/21060945/simple-way-to-copy-a-file-in-golang
+func moveFileContents(src, dst string) (err error) {
+	closeInFile := true
+	in, err := os.Open(src)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if closeInFile {
+			in.Close()
+		}
+	}()
+	out, err := os.Create(dst)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		cerr := out.Close()
+		if err == nil {
+			err = cerr
+		}
+	}()
+	if _, err = io.Copy(out, in); err != nil {
+		return err
+	}
+	err = out.Sync()
+	if err != nil {
+		return err
+	}
+
+	in.Close()
+	closeInFile = false
+	os.Remove(src)
+	return nil
+}
+
 // BuildFile will take the list of files concatenated and minify (if a minifier is provided) them.
 // As the order of the files can be important we take the order of the file provided.
 // If a file is listed more then once, only the first listing will be included.
@@ -156,7 +196,8 @@ DONE_PREFIX:
 	fname := fmt.Sprintf("%v-%x%v", prefix, sha1.Sum(jsobj), ext)
 	filename = filepath.Join(dist, fname)
 	os.MkdirAll(dist, os.ModePerm)
-	if err := os.Rename(tmpfile.Name(), filename); err != nil {
+
+	if err := moveFileContents(tmpfile.Name(), filename); err != nil {
 		return "", err
 	}
 	return fname, nil
