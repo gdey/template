@@ -3,9 +3,13 @@ package helpers
 import "mime"
 
 const (
-	JSMimeType   = "text/javascript"
-	CSSMimeType  = "text/css"
-	TXTMimeType  = "text/plain"
+	// JSMimeType is the mime type for javascript files.
+	JSMimeType = "text/javascript"
+	// CSSMimeType is the mime type for CSS files.
+	CSSMimeType = "text/css"
+	// TXTMimeType is the mime type for Text files
+	TXTMimeType = "text/plain"
+	// JSOMMimeType is the mime type for JSon files.
 	JSONMimeType = "text/json"
 )
 

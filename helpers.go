@@ -42,6 +42,8 @@ func filepatternToFilenames(base string, patterns []string) (filenames []string,
 	return filenames, nil
 }
 
+// BuildJSFile is a helper function that takes a set of filename and generated a combined (minimizied if a minimizer is provided)
+// Javascript file.
 func (t *Template) BuildJSFile(patterns ...string) (filename string, err error) {
 
 	filenames, err := filepatternToFilenames(t.base, patterns)
@@ -65,6 +67,7 @@ func (t *Template) BuildJSFile(patterns ...string) (filename string, err error) 
 	return filename, err
 }
 
+// LinkToAndBuildJSFile is the same as the buildJSFiles but will return a script tag contain the appropriate URL.
 func (t *Template) LinkToAndBuildJSFile(fnames string) (template.HTML, error) {
 	var filenames []string
 	for _, fname := range strings.Split(fnames, ",") {
@@ -85,6 +88,8 @@ func (t *Template) LinkToAndBuildJSFile(fnames string) (template.HTML, error) {
 	return template.HTML(fmt.Sprintf(`<script type="text/javascript" src="%v"></script>`, filename)), nil
 }
 
+// BuildCSSFile is a helper function that takes a set of filename and generated a combined (minimizied if a minimizer is provided)
+// Javascript file.
 func (t *Template) BuildCSSFile(patterns ...string) (filename string, err error) {
 
 	filenames, err := filepatternToFilenames(t.base, patterns)
@@ -108,6 +113,7 @@ func (t *Template) BuildCSSFile(patterns ...string) (filename string, err error)
 	return filename, err
 }
 
+// LinkToAndBuildCSSFile is the same as the buildCSSFiles but will return a link tag contain the appropriate URL.
 func (t *Template) LinkToAndBuildCSSFile(fnames string) (template.HTML, error) {
 	var filenames []string
 	for _, fname := range strings.Split(fnames, ",") {

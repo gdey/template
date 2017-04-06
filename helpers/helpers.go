@@ -18,20 +18,23 @@ type Minifier interface {
 	Minify(mimetype string, w io.Writer, r io.Reader) error
 }
 
-// Turn this on to disregard the file existence check.
+// ReloadAlways controls weather the system will reload files ignoring the file existence check.
 var ReloadAlways bool
 
 /*
 This file contains the helpers that come with the templates.
 */
 
+// Helpers are the helper functions for the templates. This is the same as template.FuncMap
 var Helpers template.FuncMap
 
+// FileError tracks the filename and the error that was produced trying to read or build the file.
 type FileError struct {
 	Filename string
 	Error    error
 }
 
+// BuildError is the error type that can be generated during a build. It will be a collection of errors that can result.
 type BuildError []FileError
 
 func (be BuildError) Error() string {
@@ -44,13 +47,16 @@ func (be BuildError) Error() string {
 	return errstr
 }
 
+// KeyValueType is the item type for a ordered map.
 type KeyValueType struct {
 	Key   string
 	Value string
 }
 
+//OrderedMapType provides an ordered map.
 type OrderedMapType []KeyValueType
 
+// Exists Checks to see if the key exists in the map.
 func (omap OrderedMapType) Exists(key string) bool {
 	if len(omap) == 0 {
 		return false
@@ -63,6 +69,7 @@ func (omap OrderedMapType) Exists(key string) bool {
 	return false
 }
 
+// ExistsAt returns if the items exists in the map, and where at.
 func (omap OrderedMapType) ExistsAt(key string) (at int, ok bool) {
 	if len(omap) == 0 {
 		return 0, false
@@ -75,6 +82,7 @@ func (omap OrderedMapType) ExistsAt(key string) (at int, ok bool) {
 	return 0, false
 }
 
+// Set allows you to associate a key with the value. It will override any existing value for that key.
 func (omap OrderedMapType) Set(key, value string) OrderedMapType {
 	if at, ok := omap.ExistsAt(key); ok {
 		omap[at].Value = value
@@ -84,10 +92,10 @@ func (omap OrderedMapType) Set(key, value string) OrderedMapType {
 	return omap
 }
 
-// copyFileContents copies the contents of the file named src to the file named
+// moveFileContents copies the contents of the file named src to the file named
 // by dst. The file will be created if it does not already exist. If the
 // destination file exists, all it's contents will be replaced by the contents
-// of the source file.
+// of the source file. The source file is removed if everything is successful.
 // Gotten from: http://stackoverflow.com/questions/21060945/simple-way-to-copy-a-file-in-golang
 func moveFileContents(src, dst string) (err error) {
 	closeInFile := true
@@ -202,5 +210,3 @@ DONE_PREFIX:
 	}
 	return fname, nil
 }
-
-
